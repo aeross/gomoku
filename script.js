@@ -5,7 +5,7 @@ let currPlayer = X;
 let board;
 
 // resets the board back to an empty 15x15 board.
-function reset() {
+function resetBoard() {
     board = [];
     for (let i = 0; i < SIZE; i++) {
         board.push([]);
@@ -20,19 +20,16 @@ function reset() {
  * of checking where the entire board doesn't have to be scanned -- instead, only the 
  * corresponding horizontal, vertical, and diagonal lines of the player's last move.
  */
-function checkWin(lastMove = null) {
-    if (!lastMove) return false;
-    let x = lastMove[0], y = lastMove[1];
-    
+function checkWin(x, y) {
     // vertical
-    for (let i = 0; i < SIZE; i++) {
+    for (let i = 0; i < SIZE - 4; i++) {
         if (board[i][y] && board[i+1][y] === board[i][y] && board[i+2][y] === board[i][y]
                         && board[i+3][y] === board[i][y] && board[i+4][y] === board[i][y]) {
             return currPlayer;
         }
     }
     // horizontal
-    for (let i = 0; i < SIZE; i++) {
+    for (let i = 0; i < SIZE - 4; i++) {
         if (board[x][i] && board[x][i+1] === board[x][i] && board[x][i+2] === board[x][i]
                         && board[x][i+3] === board[x][i] && board[x][i+4] === board[x][i]) {
             return currPlayer;
@@ -54,12 +51,12 @@ function checkWin(lastMove = null) {
 }
 
 /* returns true if the next move results in a win, false otherwise */
-function move(nextMove) {
+function move(x, y) {
     for (let i = 0; i < SIZE; i++) {
         for (let j = 0; j < SIZE; j++) {
-            if (i === nextMove[0] && j === nextMove[1]) {
+            if (i === x && j === y) {
                 board[i][j] = currPlayer;
-                if (checkWin(nextMove)) return true;
+                if (checkWin(x, y)) return true;
             }
         }
     }
@@ -71,11 +68,15 @@ class Front {
     #cells;
     #text;
     #reset;
+    #lastClickedCell;
+    #lastClickedCellColour;
     constructor() {
         this.#box = document.querySelector(".box");
         this.#cells = document.querySelectorAll(".cell");
         this.#text = document.querySelector(".text");
         this.#reset = document.querySelector("button");
+        this.#lastClickedCell = null;
+        this.#lastClickedCellColour = null;
     }
 
     // creates 15x15 HTML elements for the board.
@@ -84,7 +85,7 @@ class Front {
             for (let j = 0; j < SIZE; j++) {
                 const cell = document.createElement("div");
                 cell.setAttribute("class", "cell");
-                // pad rows and cols to 2 digits (i.e., 5 becomes 05, 11 stays as 11)
+                // pad rows and cols to 2 digits for id parsing (i.e., 5 becomes 05, 11 stays as 11)
                 let row = String(i).padStart(2, '0');
                 let col = String(j).padStart(2, '0');
                 cell.setAttribute("id", `${row}${col}`);
@@ -99,7 +100,7 @@ class Front {
             }
         }
         this.#cells = document.querySelectorAll(".cell");
-        reset();
+        resetBoard();
     }
 
     // draws 'X' or 'O' if a cell is clicked. Need buildBoard() to be called first.
@@ -107,15 +108,26 @@ class Front {
         this.#cells.forEach(cell => {
             cell.addEventListener("click", () => {
                 if (!cell.innerHTML && !isGameOver) {
+                    // convert previous cell's colour back to the its default colour
+                    if (this.#lastClickedCell && this.#lastClickedCellColour) {
+                        this.#lastClickedCell.style.backgroundColor = this.#lastClickedCellColour;
+                    }
+                    // convert the current cell's colour to yellow
+                    this.#lastClickedCell = cell;
+                    let style = getComputedStyle(cell);
+                    this.#lastClickedCellColour = style.backgroundColor;
+                    cell.style.backgroundColor = "var(--last-move)";
+
+                    // draw X or O on the board
                     cell.innerHTML = currPlayer;
                     const id = cell.id;
                     let moveX = +(id[0] + id[1]), moveY = +(id[2] + id[3]);
-                    if (move([moveX, moveY])) {
+                    if (move(moveX, moveY)) {
                         // if currPlayer wins
                         this.#text.innerHTML = `Player ${currPlayer} wins!`;
                         isGameOver = true;
                     } else {
-                        // otherwise, if no one wins, the game goes on
+                        // if no one wins yet
                         switch (currPlayer) {
                             case X: currPlayer = O; break;
                             case O: currPlayer = X; break;
@@ -129,7 +141,7 @@ class Front {
     // reset
     resetOnClick() {
         this.#reset.addEventListener("click", () => {
-            reset();
+            resetBoard();
             this.#cells.forEach(cell => {
                 cell.innerHTML = "";
             });
@@ -142,7 +154,6 @@ class Front {
 
 
 // MAIN
-reset();
 let front = new Front();
 front.buildBoard();
 front.cellOnClick();

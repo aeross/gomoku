@@ -3,6 +3,7 @@
     --border: black;
     --cell1: rgb(227, 227, 227);
     --cell2: rgb(191, 191, 191);
+    --last-move: rgb(255, 255, 200);
 }
 
 *, *::after, *::before {
