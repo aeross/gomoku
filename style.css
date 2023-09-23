@@ -12,30 +12,33 @@
 }
 
 .wrapper {
-    width: 360px;
     margin: auto;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
 
 .box, .cell {
-    border: 2px solid var(--primary);
+    border: 1.5px solid var(--primary);
 }
 
 .box {
     margin: 30px;
     margin-bottom: 15px;
+    flex-shrink: 0;
 }
 
 .box {
-    width: 300px;
-    height: 300px;
+    width: 500px;
+    height: 500px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(15, 1fr);
 }
 
 .cell {
-    font-size: 40px;
-    font-weight: 1000;
+    font-size: 20px;
+    font-weight: 800;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -46,10 +49,12 @@
 }
 
 .bottom {
+    width: 140px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 10px;
 }
 
 p {
