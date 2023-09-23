@@ -1,10 +1,12 @@
 :root {
-    --primary: black;
-    --secondary: white;
-    --tertiary: grey;
+    --primary: lightgray;
+    --border: black;
+    --cell1: rgb(227, 227, 227);
+    --cell2: rgb(191, 191, 191);
 }
 
 *, *::after, *::before {
+    background: var(--primary);
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -19,18 +21,18 @@
 }
 
 .box, .cell {
-    border: 1.5px solid var(--primary);
+    border: 1.5px solid var(--border);
 }
 
 .box {
-    margin: 30px;
+    margin: 27px;
     margin-bottom: 15px;
     flex-shrink: 0;
 }
 
 .box {
-    width: 500px;
-    height: 500px;
+    width: 515px;
+    height: 515px;
     display: grid;
     grid-template-columns: repeat(15, 1fr);
     grid-template-rows: repeat(15, 1fr);
@@ -63,6 +65,7 @@ p {
 }
 
 button {
+    background-color: var(--cell1);
     border-radius: 8px;
     padding: 4px 10px;
 }
