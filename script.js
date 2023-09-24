@@ -15,10 +15,10 @@ function resetBoard() {
     }
 }
 
-/** Checks for winning condition, and returns the winning playern(if a win is found) 
+/** Checks for winning condition, and returns the winning player (if a win is found) 
  * or false (if a win is not found). Note: this function implements a more efficient way 
  * of checking where the entire board doesn't have to be scanned -- instead, only the 
- * corresponding horizontal, vertical, and diagonal lines of the player's last move.
+ * corresponding horizontal, vertical, and diagonal lines of the player's last move are scanned.
  */
 function checkWin(x, y) {
     // vertical
@@ -36,18 +36,8 @@ function checkWin(x, y) {
         }
     }
     // diagonal
-    // let a = x - 4, b = y - 4, found = 1;
-    // for (let i = 0; i < SIZE; i++) {
-    //     if (board[a][b] && board[a+1][i+1] === board[a][b]) {
-    //         found++;
-    //     } else {
-    //         found = 1;
-    //     }
-    //     if (found === 5) {
-    //         return currPlayer;
-    //     }
-    //     a++; b++;
-    // }
+    // ...
+    return false;
 }
 
 /* returns true if the next move results in a win, false otherwise */
@@ -79,6 +69,7 @@ class Front {
         this.#lastClickedCellColour = null;
     }
 
+    
     // creates 15x15 HTML elements for the board.
     buildBoard() {
         for (let i = 0; i < SIZE; i++) {
@@ -108,16 +99,7 @@ class Front {
         this.#cells.forEach(cell => {
             cell.addEventListener("click", () => {
                 if (!cell.innerHTML && !isGameOver) {
-                    // convert previous cell's colour back to the its default colour
-                    if (this.#lastClickedCell && this.#lastClickedCellColour) {
-                        this.#lastClickedCell.style.backgroundColor = this.#lastClickedCellColour;
-                    }
-                    // convert the current cell's colour to yellow
-                    this.#lastClickedCell = cell;
-                    let style = getComputedStyle(cell);
-                    this.#lastClickedCellColour = style.backgroundColor;
-                    cell.style.backgroundColor = "var(--last-move)";
-
+                    this.#nextCellColour(cell);
                     // draw X or O on the board
                     cell.innerHTML = currPlayer;
                     const id = cell.id;
@@ -148,7 +130,26 @@ class Front {
             this.#text.innerHTML = "";
             currPlayer = X;
             isGameOver = false;
+            // convert previous cell's colour back to the its default colour
+            this.#nextCellColour(null);
         });
+    }
+
+    /* -------------------- PRIVATE METHODS -------------------- */
+    
+    /* convert last clicked cell's colour back to the its default colour,
+    and the next cell's colour to yellow (if exists). */
+    #nextCellColour(nextCell) {
+        if (this.#lastClickedCell && this.#lastClickedCellColour) {
+            this.#lastClickedCell.style.backgroundColor = this.#lastClickedCellColour;
+        }
+        
+        if (nextCell) {
+            this.#lastClickedCell = nextCell;
+            let style = getComputedStyle(nextCell);
+            this.#lastClickedCellColour = style.backgroundColor;
+            nextCell.style.backgroundColor = "var(--last-move)";  // --last-move is yellow (roughly)
+        }
     }
 }
 
